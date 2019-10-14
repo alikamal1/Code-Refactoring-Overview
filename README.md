@@ -96,7 +96,24 @@ method conatins too many lines of code (longer that ten lines)
 - Conditionals and Loops are good clue that can can be mover to a separate method. **Decompose Conditional** for conditionals 
   ```PHP
   if($date->before(SUMMER_START) || $date->after(SUMMER_END)) {
-      
+      $charge = $quantity * $winterRate +  $winterServiceCharge;
+  } else {
+      $charge = $quantity * $summerRate;
+  }
+  ```
+
+  ```PHP
+  
+  ```
+  **Extract Method** for loops
+  
+  ```
+
+  ```PHP
+  if(isSummer($date)) {
+      $charge = summerCharge($quantity);
+  } else {
+      $charge = winterCharge($quantity);
   }
   ```
 
