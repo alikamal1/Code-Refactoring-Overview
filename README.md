@@ -436,7 +436,42 @@ class Discounts {
         return $result;
     }
     public static function applyCoupons($total) {
-        
+
     }
 }
+```
+- when switch is based on type code, when the program runtime mode is switched **Repleace Type Code with Sublcasses** or **Replace Type Code with State/Strategy**
+- **Replace Conditional with Polymorphism**
+```PHP
+Class Bird {
+    public function getSpeed() {
+        switch($this->type) {
+            case EUROPEAN: return $this->getBaseSpeed();
+            case AFRICAN: return $this->getBaseSpeed() - $this->getLoadFactor() * $this->numberOfCocounts;
+            case NORWEGIAN_BLUE: return ($this->isNailed) ? 0 : $this->getBaseSpeed($this->voltage);
+        }
+        throw new Exception("Should be unreachable");
+    }
+}
+```
+```PHP
+abstract class Bird {
+    abstract function getSpeed();
+}
+class European extends Bird {
+    public function getSpeed() {
+        return $this->getBaseSpeed();
+    }
+}
+class African extends Bird {
+    public function getSpeed() {
+        return $this->getBaseSpeed() - $this->getLoadFactor() * $this->numberOfCocounts;
+    }
+}
+class NorwegianBlue extends Bird {
+    public function getSpeed() {
+        return ($this->isNailed) ? 0 : $this->getBaseSpeed($this->voltage);
+    }
+}
+$speed = $bird->getSpeed();
 ```
