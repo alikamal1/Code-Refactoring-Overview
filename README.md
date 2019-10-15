@@ -101,23 +101,131 @@ method conatins too many lines of code (longer that ten lines)
       $charge = $quantity * $summerRate;
   }
   ```
-
   ```PHP
-  
-  ```
-  **Extract Method** for loops
-  
-  ```
-
-  ```PHP
-  if(isSummer($date)) {
+   if(isSummer($date)) {
       $charge = summerCharge($quantity);
   } else {
       $charge = winterCharge($quantity);
   }
   ```
+  **Extract Method** for loops
+  ```PHP
+  function printProperties($user) {
+      for($i=0;$i<$users->size();$i++) {
+          $result = "";
+          $result .= $user->get($i)->getName();
+          $result .= " ";
+          $result .= $user->get($i)->getAge();
+          echo $result;
+      }
+  }
+  ```
+  ```PHP
+  function printProperties($user) {
+      foreach($users as $user) {
+          echo $this->getProperties($user);
+      }
+  }
+  function getProperties($user) {
+      return $user->getName()." ".$user->getAge();
+  }
+  ```
+
+
+
 
 ## Large Class
 class contains many fields, methods or line of code
+- **Extract Class** 
+  ```PHP
+  class Person {
+      private $name;
+      private $officeAreaCode;
+      private $officeNumber;
+      public getTelephoneNumber();
+  }
+  ```
+  ```PHP
+  class Person {
+      private $name;
+      public getTelephoneNubmer;
+  }
+  class TelephoneNumber {
+      private $officeAreaCode;
+      private $officeNumber;
+      public getTelephoneNumber();
+  }
+  ```
+- **Extract Subclass** 
+  ```PHP
+  class JobItem {
+      public getTotalPrice();
+      public getUnitPrice();
+      public getEmployee();
+  }
+  ```
+  ```PHP
+  class JobItem extends LaborItem {
+      public getTotalPrice();
+      public getUnitPrice();
+      public getEmployee();
+  }
+  class LaborItem {
+      public getUnitPrice();
+      public getEmployee();
+  }
+  ```
+- **Extract Interface**
+  ```PHP
+  class Employee {
+      public getRate();
+      public hasSpecialSkill();
+      public getName();
+      public getDepartment();
+  }
+  ```
+  **Extract Interface**
+  ```PHP
+  interface Billable {
+      public getRate();
+      public hasSpecialSkill();
+  }
+  class Employee implements Billable {
+      public getRate();
+      public hasSpecialSkill();
+      public getName();
+      public getDepartment();
+  }
+  ```
+- Separate GUI and Domain Data **Duplicate Observed Data**
+  ```PHP
+  class InteralWindow {
+      private TextField $startField;
+      private TextField $endField;
+      private TextField $lengthField;
+      public StartField_FocusLost();
+      public EndField_FocusLost();
+      public LengthField_FocusLost();
+      public calculateLength();
+      public calculateEnd();
+  }
+  ```
+  ```PHP
+  class InteralWindow {
+      private TextField $startField;
+      private TextField $endField;
+      private TextField $lengthField;
+      public StartField_FocusLost();
+      public EndField_FocusLost();
+      public LengthField_FocusLost();
+  }
+  class Interval {
+      private string $start;
+      private string $end;
+      private string $length;
+      public calculateLength();
+      public calcuateEnd();
+  }
+  ```
 
 ## Primitive Obsession
