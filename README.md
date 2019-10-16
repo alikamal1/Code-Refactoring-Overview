@@ -475,3 +475,50 @@ class NorwegianBlue extends Bird {
 }
 $speed = $bird->getSpeed();
 ```
+**Replace Type Code with State/Strategy**
+```PHP
+function setValue($name, $value) {
+    if($name === "height") {
+        $this->height = $value;
+        return;
+    }
+    if($name === "width") {
+        $this->width = $value;
+        return;
+    }
+    assert("Should never reach here");
+}
+```
+```PHP
+function setHeight($arg) {
+    $this->height = $arg;
+}
+function setWidth($arg) {
+    $this->width = $arg;
+}
+```
+- if one of the conditional option is `null` **Introduce Null Object**
+```PHP
+if($customer === null) {
+    $plan = BillingPlan::basic();
+} else {
+    $plan = $customer->getPlan();
+}
+```
+```PHP
+class NullCustomer extends Customer {
+    public function isNull() {
+        return true;
+    }
+    public function getPlan() {
+        return new NullPlan();
+    }
+    // some other NULL functionality
+}
+// Replace null values with Null-object
+$customer = ($order->customer !== null) ? $order->customer : new NullCustomer
+// Use Null-object as if it's normal subclass
+$plan = $customer->getPlan();
+``` 
+_Ignore when `switch` operator performs simple action, there's no reason to make code changes_
+_often `switch` operators used by factory design pattern to select a created class_
