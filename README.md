@@ -522,3 +522,50 @@ $plan = $customer->getPlan();
 ``` 
 _Ignore when `switch` operator performs simple action, there's no reason to make code changes_
 _often `switch` operators used by factory design pattern to select a created class_
+
+## Temporary Field
+get their values only under certain circumstances, otherwise they're empty
+- Extract Temporary Fields and Related Behaviors, temporary fields and all code operating on them can be put in a separate class via **Extact Class**, in other words you're creating a method object, archieving the same results as if you would perform **Replace Method with Method Object**
+- **Introduce Null object** and integrate it in place of the conditional code which was used to check the temporary field values for existence
+
+## Refused Bequest
+if subclass uses only some of methods and properties _inherited_ from its parents, the hierarchy is off-killer. the unneeded method may simply go unsed or be redfined and give off exceptions
+- if inheritance make no sense and the subclass really does have nothing in common with superclass, eliminate iheritance in favor of **Replace Inheritance with Delegation** 
+- **Extract Superclass** if inheritance is approperiate, get rid of unneeded fields and methods in the subclass. extract all fields and methods needed by the subclass from the paraent class, put them in a new subclass and set both classes to inherit from it
+  ```PHP
+  class Department {
+      public function getTotalAnnualCose();
+      public function getName();
+      public function getHeadCount();
+  }
+  class Employee {
+      public function getAnnualCose();
+      public function getName();
+      public function getId();
+  }
+  ```
+  ```PHP
+  class Party {
+      public function getAnnualCose();
+      public function getName();
+  }
+  class Department extends Party {
+      public function getAnnualCose();
+      public function getHeadCount();
+  }
+  class Employee extends Party {
+      public function getAnnualCose();
+      public function getId();
+  }
+  ```
+
+## Alternative Classes with Different Interfaces
+two classes perform identical functions but have different method names
+- **Rename Method** to make them identical in all alternative classes
+- Make Methods Signatures and Implementataion Identical. **Move Method** when a method used more in another class thank in its own class, **Add Parameter** when method doesn't have enough data to perform certain actions, **Paramerterize Method** when multiple mehtods perform similar actions that are different only in their internal values, numbers or operations combine these methods and use parameter that pass necessary special value
+- Extract Only Identical Parts, if only part of the functionality of the classes is duplicated, use **Extract Superclass**, the existing classes will become subclasses
+- **Delete Clones** after determine which treatment method to use and implemented it, you may able to delete one of classes
+  
+# Change Preventers
+need to change something in one place in code, you have to make many changes in other places too.
+## Divergent Change
