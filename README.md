@@ -569,3 +569,233 @@ two classes perform identical functions but have different method names
 # Change Preventers
 need to change something in one place in code, you have to make many changes in other places too.
 ## Divergent Change
+when have to change many unrelated methods when you make changes to a class, when adding new product type and you have to change methods for finding, displaying and ordering products
+- **Extract Class**
+- Combine classes through inheritance, if different classes have the same behavior combine the classes through inheritance(**Extract Superclass** and **Extract Subclass**)
+## Shoutgun Surgery
+making any modifications requires that you make small changes to many different classes, single responsibility has been split up among large number of classes
+- Consolidate Responsibility in a Single Class, use **Move Method** and **Move Field** to move existing class behaviors into single claass, if there's no class appropriate for this then create a new one
+- Remove Redundant Classes, if moving code to the same calss leaves the original classes almost empty, try to get rid of these now-redundant classes via **Inline CLass**
+## Parallel Inheritance Hierarchies
+whenever you create a subcalss for a class you find yourself needing to create a subclass for another class
+- Merge Class Hierarchies (if possible), you may de-duplicate parallel class hierarchies in two steps. first make instances of one hierarchy refer to instances of another hierarchy then remove hierarchy in the referred class by using **Move Method** and **Move Field**
+
+# Dispensables
+a dispensable is something pointless and unneeded whose absence would make the code cleaner, more efficient and easier to understand
+## Comments
+methods filled with explanatory comments, the best comment is a good name for a method or class
+- if a comment is intended to explain a complex expression, the experssion should be split into understandable subexpression using **Extract Variable**
+  ```PHP
+  if(($platform->toUpperCase()->indexIf("MAC") > -1) && ($browser->toUpperCase()->indexOf("IE") > -1 ) && $this->wasInitialized() && $this->resize > 0) {
+
+  }
+  ```
+  ```PHP
+  $isMacOs = $platform->toUpperCase()->indexIf("MAC") > -1;
+  $isIE = $browser->toUpperCase()->indexOf("IE") > -1;
+  $wasReized = $this->resize > 0;
+  if($isMacOs && $isIE && $this->wasInitialized() && $wasResized) {
+
+  }
+  ```
+- if comment explains a section of code, this section can be turned into a separate method via **Extract Method**, the name of the new method can be taken from the comment text itself
+- **Rename Method** if a mehtod has already been extracted but comments still necessary to explain what the method does, give the method a self-explanatory name
+- **Introduce Assertion** if you need to assert rules about a state that's necessary for the system to work
+  ```PHP
+  function getExpenseLimit() {
+      //should have either expense limit or a primary project
+      return ($this->expenseLimit !== NULL_EXPENSE) ? $this->expenseLimit;
+      $this->primaryProject->getMemeberExpenseLimit();
+  }
+  ```
+  ```PHP
+  function getExpenseLimit() {
+      assert($this->expenseLimit !== NULL_EXPENSE || isset($this->primaryProject));
+      return ($this->expenseLimit !== NULL_EXPENSE) ? $this->expenseLimit : $this->primaryProject->getMemberExpenseLimit();
+  }
+  ```
+## Duplicate Code
+two code fragments look almost identical
+- if the same code is found in two or more methods in the same class use **Extract Method** and place calls for the new method in both places
+- if same code is found in two subclasses of the same level use **Extract Method** for both classes followed by **Pull Up Field** for the fields used in the method that you're pulling up
+  ```PHP
+  class Unit {}
+  class Soldier extends Unit {private $health;}
+  class Tank extends Unit {private $health;}
+  ```
+  ```PHP
+  class Unit {private $health;}
+  class Soldier extends Unit {}
+  class Tank extends Unit {}
+  ```
+- if the same code is found in two subclasses of the same level, if duplicate code is inside constructor use **Pull up Constructor Body**
+  ```PHP
+  class Manger extends Employee {
+      public function __construct($name, $id, $grage) {
+          $this->name = $name;
+          $this->id = $id;
+          $this->grage = $grage;
+      }
+  }
+  ```
+  ```PHP
+  class Manger extends Employee {
+      public function __construct($name, $id, $grage) {
+          parent::__construct($name, $id);
+          $this->grage = $grage;
+      }
+  }
+  ```
+- if same code is found in two subclasses of the same level, if the duplicate code is similar but not completely identical use **Form Template Method**
+  ```PHP
+  class Site { }
+  class ResidentialSite extends Site {
+      getBuillableAmount() {
+          $base = $this->units * $this->rate;
+          $tax = $base * Site::TEX_RATE;
+          return $base + $tax;
+      }
+  }
+  class LifelineSite extends Site {
+      getBuillableAmount() {
+          $base = $this->units * $this->rate * 0.5;
+          $tax = $base * Site::TEX_RATE * 0.2;
+          return $base + $tax;
+      }
+  }
+  ```
+  ```PHP
+  class Site {
+      getBillableAmount() {
+          return $this->getBaseAmount() + $this->getTaxAmount();
+      }
+      getBaseAmount();
+      getTaxAmount();
+   }
+  class ResidentialSite extends Site {
+      getBaseAmount();
+      getTaxAmount();
+  }
+  class LifelineSite extends Site {
+      getBaseAmount();
+      getTaxAmount();
+  }
+  ```
+- if same code is found in two sublcasses of the same level, if two method do the same thing but use different algorithm, select thte best algrorithm and applay **Subsitute Algorithm**
+  ```PHP
+  function foundPerson(array $people) {
+      for($i=0;$i<count($people);$i++) {
+          if($people[$i] === "Don") {
+              return "Don";
+          }
+          if($people[$i] === "John") {
+              return "John";
+          }
+          if($people[$i] === "Kent") {
+              return "Kent";
+          }
+      }
+      return "";
+  }
+  ```
+  ```PHP
+  function foundPerson(array $people) {
+      foreach(["Don", "John", "kent"] as $needle) {
+          $id = array_search($needle, $people, true);
+          if($id !== false) {
+              return $people[$id];
+          }
+      }
+      return "";
+  }
+  ```
+- if duplicate code is found in two different classes, if the classes aren't part of hierrachy use **Extract Superclass** in order to create a single superclass for theses classes that maintains all the previous functionality
+- if duplicate code is found in two different classes, if it's difficult or impossible to create a superclass, use **Extract Class** in one class and use the new component in the other
+- if large number of conditional expressions are present and perform the same code (differing only in their conditions), merge these operators into a single condition using **Consolidate Conditional Expression** and use **Extract Method** to place the condition in separate method with easy-to-understand name
+  ```PHP
+  function disabilityAmount() {
+      if($this->seniority < 2) {
+          return 0;
+      }
+      if($this->monthsDisabled < 12) {
+          return 0;
+      }
+      if($this->isPartTime) {
+          return 0;
+      }
+      // compute the disability amount
+  }
+  ```
+  ```PHP
+  function disabilityAmount() {
+      if($this->isNotEligableForDisability()) {
+          return 0;
+      }
+      // compute the disability amount
+  }
+  ```
+- if the same code is performed in all branches of a conidtional expression, place the identical code outside of the condition tree by using **Consolidate Duplicate Conditional Fragments**
+  ```PHP
+  if(isSpecialDeal()) {
+      $total = $price * 0.95;
+      send();
+  } else {
+      $total = $price * 0.98;
+      send();
+  }
+  ```
+  ```PHP
+  if(isSpecialDeal()) {
+      $total = $price * 0.95;
+  } else {
+      $total = $price * 0.98;
+  }
+  send();
+  ```
+## Lazy Class
+Understanding and maintaining classes always costs time and money, so if class doesn't do enough to earn your attention it should be deleted
+- componets that are near-useless should be give the **Inline Class**
+- **Collapse Hierarchy** subclass with few functions
+## Data Class
+data refers to a class that contains only fields and crude methods for accessing them (getters and setters), these are simply containers for data used by other classes, these classes don't contain any additional functionality and can't independently operate on the data that they own
+- if class contains public fields use **Encapsulate Field** to hide them from direct access and require that access be performed via getters and setters only
+  ```PHP
+  public $name;
+  ```
+  ```PHP
+  private $name;
+  public getName() {
+      return $this->name;
+  }
+  public setName($arg) {
+      $this->name = $arg;
+  }
+  ```
+- use **Encapsulate Collection** for data stored in collection (such as array)
+- review the client code that uses the class, in it you may find functionality that would be better located in the data class itself, if this is the case use **Move Method** and **Extract Method** to migrate this functionality to the data class
+- get rid of old data access methods, after the class has been filled with well thought-out methods, you may may want to get rid of old methods for data access that give overly broad access to the class data for this **Remove Setting Method** and **Hide Method**
+## Dead Code
+variable, parameter, field, method or class is no longer used (usually because it's obsolete)
+- delete unused code an uneeded files
+- remove unsed classes **Inline class** or **Collapse Hierarchy** can be applied if subclass or superclass is used
+- remove unsed parameters using **Remove Prameter**
+## Speculative Generality
+there's an unused class, method, field or parameter
+- **Collapse Hierarchy** for removing unsed abstract classes
+- **Inline Class** for unnecessary delegation of functionality to another class can be eliminated
+- **Inline Method** for unused methods
+- **Remove Paramenter** for methods with unused paramenters
+- delete unused fields
+# Couplers
+all the smells in this group contribute to excessive coupling between classes or show what happens if coupling is replaced by excessive delegation
+## Feature Envy
+method accesses the data of another object more than its own data
+- if method clearly should be moved to another place use **Move Method**
+- if only part of method accesses the data of another object, use **Extract Method** to move the part in question
+- among two classes pick the one where most data lives, if method uses functions from serveral other classes, first determine which class contains most of the data used. then place the method in this class along with the other data. alternatively use **Extract Method** to split the method into serveral parts that can be placed in different places in different classes
+## Inappropriate Intimacy
+one class uses the internal fields and methods of another class
+- move code to those classes where it's used, the simplest solution is to use **Move Method** and **Move Field** to move parts of one class to the class in which those parts are used, but this works only if the first class truly doesn't need thse parts
+- use **Extract Class** and **Hide Delegate** on the class to make the code relations official
+- if the classes are mutually interdependent use **Change Bidirectional Association to Unidirectional**
+- if this intimacy is between subclass and the superclass, consider **Replace Delegation with Inheritance**
