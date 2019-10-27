@@ -826,3 +826,6 @@ one class uses the internal fields and methods of another class
   }
   ```
 - for big changes in class library use **Introduce Local Extension**
+
+### Reference
+https://refactoring.guru
