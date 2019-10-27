@@ -799,3 +799,30 @@ one class uses the internal fields and methods of another class
 - use **Extract Class** and **Hide Delegate** on the class to make the code relations official
 - if the classes are mutually interdependent use **Change Bidirectional Association to Unidirectional**
 - if this intimacy is between subclass and the superclass, consider **Replace Delegation with Inheritance**
+## Message Chains
+- to delete a message chain use **Hide Delegate**
+- Move Important Code to the Beginning of the Chain, use **Extract Method** and **Move Method**
+## Middle Man
+- if most of methods classes delegate to another class **Remove Middle Man**
+## Incomplete Library Class
+- to introduce a few methods to library class use **Introduce Foreign Method**
+  ```php
+  class Report {
+      public function sendReport() {
+          $previousDate = clone $this->previousDate;
+          $paymentDate = $previousDate->modify("+7 days");
+      }
+  }
+  ```
+  ```php
+  class Report {
+      public function sendReport() {
+          $paymentDate = self::nextWeek($this->previousDate);
+      }
+      private static function nextWeek(DateTime $arg) {
+          $previousDate = clone $arg;
+          return $previousDate->modify("+7 days");
+      }
+  }
+  ```
+- for big changes in class library use **Introduce Local Extension**
