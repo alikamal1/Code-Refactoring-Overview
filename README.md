@@ -318,16 +318,16 @@ when uses primitive instead of small object, use constant for coding information
   class Saleman { }
   ```
 - **Replace Array with Object**
-```PHP
-$row = [];
-$row[0] = "Liverpool";
-$row[1] = 15;
-```
-```PHP
-$row = new Performance;
-$row->setName("Liverpool");
-$row->setWins(15);
-```
+  ```PHP
+  $row = [];
+  $row[0] = "Liverpool";
+  $row[1] = 15;
+  ```
+  ```PHP
+  $row = new Performance;
+  $row->setName("Liverpool");
+  $row->setWins(15);
+  ```
 
 ## Long Parameter List
 - **Replace Parameter with Method Call** some of the arguments are just results of method call of another object
@@ -359,167 +359,167 @@ _Ignore when passing entire object on parameters of method instead of primitive 
 having complex `switch` operator or sequence of `if` statement. _when you see `switch` you should think of **Polymorphism**_
 - Isolate switch Operator
 **Extract Method**
-```PHP
-class Order {
-    public function calculateTotal() {
-        $total = 0;
-        foreach($this->getProducts() as $product) {
-            $total += $product->quantity * $product->price;
-        }
-        switch($this->user->getCountry()) {
-            case "US": $total *= 0.85; break;
-            case "RU": $total *= 0.75; break;
-            case "CN": $total *= 0.9; break;
-        }
-        return $total;
-    }
-}
-```
-```PHP
-class Order {
-    public function calculateTotal() {
-        $total = 0;
-        foreach($this->getProducts() as $product) {
-            $total += $product->quantity * $product->price;
-        }
-        $total = $this->applyRegionalDiscounts($total);
-        return $total;
-    }
-    public function applyRegionalDiscounts($total) {
-        $result = $total;
-        switch($this->user->getCountry()) {
-            case "US": $result *= 0.85; break;
-            case "RU": $result *= 0.75; break;
-            case "CN": $result *= 0.9; break;
-        }
-        return $result;
-    }
-}
-```
+  ```PHP
+  class Order {
+      public function calculateTotal() {
+          $total = 0;
+          foreach($this->getProducts() as $product) {
+              $total += $product->quantity * $product->price;
+          }
+          switch($this->user->getCountry()) {
+              case "US": $total *= 0.85; break;
+              case "RU": $total *= 0.75; break;
+              case "CN": $total *= 0.9; break;
+          }
+          return $total;
+      }
+  }
+  ```
+  ```PHP
+  class Order {
+      public function calculateTotal() {
+          $total = 0;
+          foreach($this->getProducts() as $product) {
+              $total += $product->quantity * $product->price;
+          }
+          $total = $this->applyRegionalDiscounts($total);
+          return $total;
+      }
+      public function applyRegionalDiscounts($total) {
+          $result = $total;
+          switch($this->user->getCountry()) {
+              case "US": $result *= 0.85; break;
+              case "RU": $result *= 0.75; break;
+              case "CN": $result *= 0.9; break;
+          }
+          return $result;
+      }
+  }
+  ```
 **Move Method**
-```PHP
-class Order {
-    public function calculateTotal() {
-        $total = 0;
-        foreach($this->getProducts() as $product) {
-            $total += $product->quantity * $product->price;
-        }
-        $total = $this->applyRegionalDiscounts($total);
-        return $total;
-    }
-    public function applyRegionalDiscounts($total) {
-        $result = $total;
-        switch($this->user->getCountry()) {
-            case "US": $result *= 0.85; break;
-            case "RU": $result *= 0.75; break;
-            case "CN": $result *= 0.9; break;
-        }
-        return $result;
-    }
-}
-```
-```PHP
-class Order {
-    public function calculateTotal() {
-        $total = Discount::applyRegionalDiscounts($total, $this->user->getCountry());
-        $total = Discount::applyCoupons($total);
-    }
-}
-class Discounts {
-    public static function applyRegionalDiscounts($total, $country) {
-        $result = $total;
-        switch($country) {
-            case "US": $result *= 0.85; break;
-            case "RU": $result *= 0.75; break;
-            case "CN": $result *= 0.9; break;
-        }
-        return $result;
-    }
-    public static function applyCoupons($total) {
+  ```PHP
+  class Order {
+      public function calculateTotal() {
+          $total = 0;
+          foreach($this->getProducts() as $product) {
+              $total += $product->quantity * $product->price;
+          }
+          $total = $this->applyRegionalDiscounts($total);
+          return $total;
+      }
+      public function applyRegionalDiscounts($total) {
+          $result = $total;
+          switch($this->user->getCountry()) {
+              case "US": $result *= 0.85; break;
+              case "RU": $result *= 0.75; break;
+              case "CN": $result *= 0.9; break;
+          }
+          return $result;
+      }
+  }
+  ```
+  ```PHP
+  class Order {
+      public function calculateTotal() {
+          $total = Discount::applyRegionalDiscounts($total, $this->user->getCountry());
+          $total = Discount::applyCoupons($total);
+      }
+  }
+  class Discounts {
+      public static function applyRegionalDiscounts($total, $country) {
+          $result = $total;
+          switch($country) {
+              case "US": $result *= 0.85; break;
+              case "RU": $result *= 0.75; break;
+              case "CN": $result *= 0.9; break;
+          }
+          return $result;
+      }
+      public static function applyCoupons($total) {
 
-    }
-}
-```
+      }
+  }
+  ```
 - when switch is based on type code, when the program runtime mode is switched **Repleace Type Code with Sublcasses** or **Replace Type Code with State/Strategy**
 - **Replace Conditional with Polymorphism**
-```PHP
-Class Bird {
-    public function getSpeed() {
-        switch($this->type) {
-            case EUROPEAN: return $this->getBaseSpeed();
-            case AFRICAN: return $this->getBaseSpeed() - $this->getLoadFactor() * $this->numberOfCocounts;
-            case NORWEGIAN_BLUE: return ($this->isNailed) ? 0 : $this->getBaseSpeed($this->voltage);
-        }
-        throw new Exception("Should be unreachable");
-    }
-}
-```
-```PHP
-abstract class Bird {
-    abstract function getSpeed();
-}
-class European extends Bird {
-    public function getSpeed() {
-        return $this->getBaseSpeed();
-    }
-}
-class African extends Bird {
-    public function getSpeed() {
-        return $this->getBaseSpeed() - $this->getLoadFactor() * $this->numberOfCocounts;
-    }
-}
-class NorwegianBlue extends Bird {
-    public function getSpeed() {
-        return ($this->isNailed) ? 0 : $this->getBaseSpeed($this->voltage);
-    }
-}
-$speed = $bird->getSpeed();
-```
+  ```PHP
+  Class Bird {
+      public function getSpeed() {
+          switch($this->type) {
+              case EUROPEAN: return $this->getBaseSpeed();
+              case AFRICAN: return $this->getBaseSpeed() -   $this->getLoadFactor() * $this->numberOfCocounts;
+              case NORWEGIAN_BLUE: return ($this->isNailed) ? 0 :   $this->getBaseSpeed($this->voltage);
+          }
+          throw new Exception("Should be unreachable");
+      }
+  }
+  ```
+  ```PHP
+  abstract class Bird {
+      abstract function getSpeed();
+  }
+  class European extends Bird {
+      public function getSpeed() {
+          return $this->getBaseSpeed();
+      }
+  }
+  class African extends Bird {
+      public function getSpeed() {
+          return $this->getBaseSpeed() - $this->getLoadFactor() * $this->numberOfCocounts;
+      }
+  }
+  class NorwegianBlue extends Bird {
+      public function getSpeed() {
+          return ($this->isNailed) ? 0 : $this->getBaseSpeed($this->voltage);
+      }
+  }
+  $speed = $bird->getSpeed();
+  ```
 **Replace Type Code with State/Strategy**
-```PHP
-function setValue($name, $value) {
-    if($name === "height") {
-        $this->height = $value;
-        return;
-    }
-    if($name === "width") {
-        $this->width = $value;
-        return;
-    }
-    assert("Should never reach here");
-}
-```
-```PHP
-function setHeight($arg) {
-    $this->height = $arg;
-}
-function setWidth($arg) {
-    $this->width = $arg;
-}
-```
+  ```PHP
+  function setValue($name, $value) {
+      if($name === "height") {
+          $this->height = $value;
+          return;
+      }
+      if($name === "width") {
+          $this->width = $value;
+          return;
+      }
+      assert("Should never reach here");
+  }
+  ```
+  ```PHP
+  function setHeight($arg) {
+      $this->height = $arg;
+  }
+  function setWidth($arg) {
+      $this->width = $arg;
+  }
+  ```
 - if one of the conditional option is `null` **Introduce Null Object**
-```PHP
-if($customer === null) {
-    $plan = BillingPlan::basic();
-} else {
-    $plan = $customer->getPlan();
-}
-```
-```PHP
-class NullCustomer extends Customer {
-    public function isNull() {
-        return true;
-    }
-    public function getPlan() {
-        return new NullPlan();
-    }
-    // some other NULL functionality
-}
-// Replace null values with Null-object
-$customer = ($order->customer !== null) ? $order->customer : new NullCustomer
-// Use Null-object as if it's normal subclass
-$plan = $customer->getPlan();
-``` 
+  ```PHP
+  if($customer === null) {
+      $plan = BillingPlan::basic();
+  } else {
+      $plan = $customer->getPlan();
+  }
+  ```
+  ```PHP
+  class NullCustomer extends Customer {
+      public function isNull() {
+          return true;
+      }
+      public function getPlan() {
+          return new NullPlan();
+      }
+      // some other NULL functionality
+  }
+  // Replace null values with Null-object
+  $customer = ($order->customer !== null) ? $order->customer : new NullCustomer
+  // Use Null-object as if it's normal subclass
+  $plan = $customer->getPlan();
+  ``` 
 _Ignore when `switch` operator performs simple action, there's no reason to make code changes_
 _often `switch` operators used by factory design pattern to select a created class_
 
